@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "parcel build --public-url . index.html",
-    "dev": "parcel index.html"
+    "dev": "parcel index.html",
+    "pages": "cd dist && git add -A && git commit -m'update binaries' && git push"
   },
 	"dependencies": {
 		"@babel/preset-typescript": "^7.0.0",
