@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "build": "parcel build --public-url . index.html",
+    "dev": "parcel index.html"
+  },
 	"dependencies": {
 		"@babel/preset-typescript": "^7.0.0",
 		"parcel": "^1.9.7",
