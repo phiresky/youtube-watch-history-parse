@@ -1,0 +1,64 @@
+<body>
+    <div id=target>Drop your "Watchhistory.html" from google takeout here</div>
+    <script>
+        function progress(text) {
+            target.textContent = text;
+        }
+        document.body.addEventListener("dragover", ev => {
+            ev.preventDefault();
+            ev.dataTransfer.dropEffect = "move";
+            document.body.style.backgroundColor = "green";
+        })
+        document.body.addEventListener("drop", ev => {
+            document.body.style.backgroundColor = "initial";
+            ev.preventDefault();
+            const f = ev.dataTransfer.files[0];
+            if (!f) throw "no file";
+            const url = URL.createObjectURL(f);
+            console.log(url);
+            const req = new XMLHttpRequest();
+            req.addEventListener("load", ev => {
+                console.timeEnd("parsed html.");
+                parseDocument(req.response);
+            })
+            req.responseType = "document";
+            req.overrideMimeType("text/html");
+            req.open("GET", url);
+            req.send();
+            console.time("parse");
+            progress("parsing html...");
+        });
+
+        function parseDocument(doc) {
+            progress("aggregating...");
+            console.log(doc);
+            const map = {};
+            let fail = 0;
+            for (const oc of doc.querySelectorAll("div.outer-cell")) {
+                const c = oc.querySelector(".content-cell");
+                const [video, channel] = c.querySelectorAll("a");
+                if (!video || !channel) { fail++; continue; }
+                const [vurl, curl] = [video.href, channel.href];
+                const [vname, cname] = [video.textContent, channel.textContent];
+
+                if (!map[curl]) map[curl] = {name: new Set(), videos: []};
+                map[curl].name.add(cname);
+                map[curl].videos.push(vurl);
+            }
+            console.log("failures: ", fail);
+            const all = Object.entries(map);
+            all.sort((a, b) => b[1].length - a[1].length);
+            const n = 100;
+            document.querySelector("div").innerHTML = `
+                <h2>Top ${n} channels watched</h2>
+                <ol>
+                    ${all.slice(0, n).map(([c, vs]) =>
+                    `<li><a href="${c}">${c.split("/").slice(-1)[0]}</a>: ${vs.length} videos
+                    </li>`).join("\n")
+                }
+                </ol>
+
+            `;
+        }
+    </script>
+</body>
