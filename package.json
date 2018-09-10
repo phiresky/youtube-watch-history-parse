@@ -1,9 +1,7 @@
 {
 	"dependencies": {
 		"@babel/preset-typescript": "^7.0.0",
-		"parcel": "^1.9.7"
-	},
-	"devDependencies": {
+		"parcel": "^1.9.7",
 		"typescript": "^3.0.3"
 	}
 }
